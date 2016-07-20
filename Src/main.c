@@ -50,16 +50,18 @@ int main(void) {
 
 	/* Init leds */
 	TM_DISCO_LedInit();
-	TM_DISCO_LedOff(LED_ALL);
     TM_DISCO_LedOn(LED_ORANGE);
     
     /* Init UART comm */
-    /* Init USART, TX: PC6, RX: PC7, 921600 bauds */
-	TM_USART_Init(USART2, TM_USART_PinsPack_1, 9600);
-    
+    /* Init USART, TX: PD5, RX: PD6, 115200 bauds */
+    TM_USART_Init(USART1, TM_USART_PinsPack_2, 115200);
+    TM_USART_Puts(USART1, (char*) MSG);
+	TM_DISCO_LedOn(LED_GREEN);
 	/* Try to mount card */
+
+
 	if (f_mount(&FS, "SD:", 1) == FR_OK) {
-		/* Try to open file */
+#if 0		/* Try to open file */
 		if ((fres = f_open(&fil, "SD:first_file.txt", FA_OPEN_ALWAYS | FA_READ | FA_WRITE)) == FR_OK) {
 			/* Read SDCARD size */
 			TM_FATFS_GetDriveSize("SD:", &CardSize);
@@ -100,9 +102,13 @@ int main(void) {
             TM_DISCO_LedOn(LED_RED);
         }
 		TM_DISCO_LedOff(LED_ORANGE);
+#endif
 		/* Unmount SDCARD */
 		f_mount(NULL, "SD:", 1);
-	}
+	} else {
+        TM_DISCO_LedOff(LED_GREEN);
+        TM_DISCO_LedOn(LED_RED);
+    }
 
 	/* Do nothing */
 	while (1) {

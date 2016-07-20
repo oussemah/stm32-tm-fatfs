@@ -1,3 +1,6 @@
+#example of usage
+#NOW=`date +"%H\:%M\:%S"`;TT=\"\\\"$NOW\\r\\n\\\"\";NOW=$TT make clean all burn
+
 #define TARGET Name
 TARGET=test_app
 
@@ -29,12 +32,22 @@ ifneq (,$(DEBUG))
 DBG = -g
 endif
 
+ifneq (,$(NOW))
+MESSAGE=$(NOW)
+else
+MESSAGE="generic"
+endif
+
+MSG_STR = MSG=$(MESSAGE)
+
 CFLAGS = $(DBG) -Wall -TSTM32F407VGTx_FLASH.ld -DUSE_STD_PERIPH_DRIVER
 CFLAGS += -mlittle-endian -mthumb -mcpu=cortex-m4 -mthumb-interwork
 CFLAGS += -mfloat-abi=soft
 CFLAGS += -IInc $(CUSTOM_INCLUDES) $(HAL_INCLUDES) $(BASE_INCLUDES)
 
 CFLAGS += -DSTM32F4_DISCOVERY -DSTM32F407xx -DUSE_HAL_DRIVER -DSTM32F4xx -DHSE_VALUE=8000000
+
+CFLAGS += -D$(MSG_STR)
 
 #define SRC FILES
 SRCS  = startup_stm32f407xx.s
@@ -83,4 +96,5 @@ burn:$(TARGET).bin
 	$(STLINK)/st-flash write $(TARGET).bin 0x8000000
 
 debug:$(TARGET).bin
-	$(DEBUGGER) $(TARGET).elf -ex "target remote :4242" -ex "b main" -ex "continue"
+	$(STLINK)/st-util -p 5000 & echo $! > /tmp/stmgdbserver.pid
+	$(DEBUGGER) $(TARGET).elf -ex "target remote :5000" -ex "b main" -ex "set print pretty on" -ex "continue"

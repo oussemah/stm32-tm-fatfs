@@ -43,6 +43,8 @@
 /*                        FATFS related settings                      */
 /**********************************************************************/
 /* Uncomment line to use SPI for SDCARD */
-//#define FATFS_USE_SDIO     0
+#define FATFS_USE_SDIO     0
+#define FATFS_CS_PORT        GPIOB
+#define FATFS_CS_PIN        GPIO_Pin_5
 
 #endif
